@@ -8,9 +8,75 @@ typedef struct {
     const char* json;
 } lept_context;
 
-static void lept_parse_whitespace(lept_context* c) {
+/*
+    lept_value v;
+    const char json[] = ...;
+    int ret = lept_parse(&v, json);
+*/
+int lept_parse(lept_value* v, const char* json) {
+    lept_context c;
+    assert(v != NULL);
+    v -> type = LEPT_NULL;
+    c.json = json;
+    lept_parse_whitespace(&c);
+    return lept_parse_value(&c, v);
+}
+
+void lept_parse_whitespace(lept_context* c) {
     const char *p = c -> json;
-    while(p == ' ' || p == '\t' || p == '\n' || p == '\r')
+    while(*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
         p++;
     c -> json = p;
+}
+
+int lept_parse_value(lept_context* c, lept_value* v) {
+    switch (*(c -> json)) {
+        case 'n':
+            return lept_parse_null(c, v);
+        
+        case 't':
+            return lept_parse_true(c, v);
+
+        case 'f':
+            return lept_parse_false(c, v);
+
+        case '\0':
+            return LEPT_PARSE_EXPECT_VALUE;
+        
+        default:
+            return LEPT_PARSE_INVALID_VALUE;
+    }   
+}
+
+int lept_parse_null(lept_context* c, lept_value* v) {
+    if(c -> json[0] != 'n' || c -> json[1] != 'u' || 
+       c -> json[2] != 'l' || c -> json[3] != 'l')
+       return LEPT_PARSE_INVALID_VALUE;
+    c -> json += 4;
+    v -> type = LEPT_NULL;
+    return LEPT_PARSE_OK;
+}
+
+int lept_parse_true(lept_context* c, lept_value* v) {
+    if(c -> json[0] != 't' || c -> json[1] != 'r' || 
+       c -> json[2] != 'u' || c -> json[3] != 'e')
+       return LEPT_PARSE_INVALID_VALUE;
+    c -> json += 4;
+    v -> type = LEPT_TRUE;
+    return LEPT_PARSE_OK;
+}
+
+int lept_parse_false(lept_context* c, lept_value* v) {
+    if(c -> json[0] != 'f' || c -> json[1] != 'a' || 
+       c -> json[2] != 'l' || c -> json[3] != 's' || 
+       c -> json[4] != 'e')
+       return LEPT_PARSE_INVALID_VALUE;
+    c -> json += 5;
+    v -> type = LEPT_FALSE;
+    return LEPT_PARSE_OK;
+}
+
+lept_type lept_get_type(const lept_value* v) {
+    assert(v != NULL);
+    return v->type;
 }
