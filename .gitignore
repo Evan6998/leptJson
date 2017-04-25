@@ -41,7 +41,7 @@
 *.su
 *.idb
 *.pdb
-.gitignore
+launch.json
 
 # Kernel Module Compile Results
 *.mod*
