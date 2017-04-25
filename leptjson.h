@@ -1,8 +1,7 @@
 #ifndef LEPTJSON_H__
 #define LEPTJSON_H__
 
-typedef enum
-{
+typedef enum {
     LEPT_NULL,
     LEPT_NUMBER,
     LEPT_STRING,
@@ -12,8 +11,7 @@ typedef enum
     LEPT_ARRAY
 } lept_type;
 
-typedef struct
-{
+typedef struct {
     lept_type type;
 } lept_value;
 
